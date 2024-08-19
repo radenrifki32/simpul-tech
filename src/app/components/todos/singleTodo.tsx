@@ -173,7 +173,7 @@ export default function SingleTodo({
   <div className="w-full me-vertical">
     <div className="flex items-center gap-2">
       {todo.favorite && todo.favorite.map((favorite, index) => (
-        <div key={index} className={`bg-${favorite.color} px-2 py-2 mx-2 rounded-md`}>
+        <div key={index} className={`px-2 py-2 mx-2 rounded-md`} style={{background: favorite.color}}>
           <p className="font-lato font-bold text-small text-center text-primary-black whitespace-nowrap">
             {favorite.title}
           </p>
@@ -186,7 +186,7 @@ export default function SingleTodo({
         <div className="absolute -bottom-[] left-5 z-20 w-1/2 bg-white shadow-md rounded-md border-[1px] border-primary-black px-4 py-4">
           <div className="flex flex-col items-center gap-3">
           {favoriteTodo.map((favorite, index) => (
-        <div key={index} className={`bg-${favorite.color} px-2 py-2 mx-2 rounded-md w-full cursor-pointer`} onClick={()=>handleAddFavorite(favorite,todo.id ?? 0)}>
+        <div key={index} className="px-2 py-2 mx-2 rounded-md w-full cursor-pointer" style={{background : favorite.color}} onClick={()=>handleAddFavorite(favorite,todo.id ?? 0)}>
           <p className="font-lato font-bold text-small text-primary-black whitespace-nowrap">
             {favorite.title}
           </p>

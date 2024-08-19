@@ -4,41 +4,41 @@ export const favoriteTodo :FavoriteTodo[] = [
     {
         id: "1",
         title: "Important Asap",
-        color: 'sticker-blue-light'
+        color: '#E5F1FF'
     },
     {
         id: "2",
         title: "Offline Meeting",
-        color: 'sticker-orange-primary'
+        color: '#FDCFA4'
     },
     {
         id: "3",
         title: "Virtual Meeting",
-        color: 'sticker-orange-light'
+        color: '#F9E9C3'
     },
     {
         id: "4",
         title: "ASAP",
-        color: 'sticker-green-primary'
+        color: '#AFEBDB'
     },
     {
         id: "5",
         title: "Client Related",
-        color: 'sticker-green-light'
+        color: '#CBF1C2'
     },
     {
         id: "6",
         title: "Self Task",
-        color: 'sticker-purple-primary'
+        color: '#CFCEF9'
     },
     {
         id: "7",
         title: "Appointment",
-        color: 'sticker-purple-light'
+        color: '#F9E0FD'
     },
     {
         id: "8",
         title: "Court Related",
-        color: 'sticker-blue-primary'
+        color: '#9DD0ED'
     }
 ];
