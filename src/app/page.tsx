@@ -154,62 +154,6 @@ const getDataChatById = async (id: number) => {
 };
 
 
-// const submitYourChat = async () => {
-//   if (yourChat === '') return;  
-//   setGroupChat((prevGroupChat) => [
-//     ...prevGroupChat, 
-//     {
-//       id : uuidv4(),
-//       sender: 'user',
-//       message: yourChat,
-//       createdDate: new Date()
-//     }
-//   ]);
-//   setYourChat("");
-//   await new Promise(resolve => setTimeout(resolve, 3000));
-//   try {
-//     const response = await groq.chat.completions.create({
-//       messages: [{
-//         role: 'user',
-//         content: yourChat
-//       }],
-//       model: 'llama3-70b-8192'
-//     });
-//     const aiMessage = response?.choices[0]?.message?.content as string;
-//     if (aiMessage) {
-//       setGroupChat((prevGroupChat) => [
-//         ...prevGroupChat, 
-//         {
-//           id : uuidv4(),
-//           sender: 'ai',
-//           message: aiMessage as string,
-//           createdDate: new Date()
-//         }
-//       ]);
-//     } else {
-//       setGroupChat((prevGroupChat) => [
-//         ...prevGroupChat, 
-//         {
-//           id : uuidv4(),
-//           sender: 'ai',
-//           message: "Saya Bingung Harus Jawab Apa ya?.",
-//           createdDate: new Date()
-//         }
-//       ]);
-//     }
-//   } catch (error) {
-//     setGroupChat((prevGroupChat) => [
-//       ...prevGroupChat, 
-//       {
-//         id : uuidv4(),
-//         sender: 'ai',
-//         message: "AI nya Sudah Terkena Limit,Mohon Maaf! :).",
-//         createdDate: new Date()
-//       }
-//     ]);
-//   }
-// };
-
 const submitYourChat = async () => {
   if (yourChat === '') return;  
   setGroupChat((prevGroupChat) => [
@@ -218,24 +162,80 @@ const submitYourChat = async () => {
       id : uuidv4(),
       sender: 'user',
       message: yourChat,
-      createdDate: new Date(),
-      reply : replyChat ? replyChat : undefined
+      createdDate: new Date()
     }
   ]);
   setYourChat("");
-  setReplayChat(null)
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, 3000));
+  try {
+    const response = await groq.chat.completions.create({
+      messages: [{
+        role: 'user',
+        content: yourChat
+      }],
+      model: 'llama3-70b-8192'
+    });
+    const aiMessage = response?.choices[0]?.message?.content as string;
+    if (aiMessage) {
+      setGroupChat((prevGroupChat) => [
+        ...prevGroupChat, 
+        {
+          id : uuidv4(),
+          sender: 'ai',
+          message: aiMessage as string,
+          createdDate: new Date()
+        }
+      ]);
+    } else {
+      setGroupChat((prevGroupChat) => [
+        ...prevGroupChat, 
+        {
+          id : uuidv4(),
+          sender: 'ai',
+          message: "Saya Bingung Harus Jawab Apa ya?.",
+          createdDate: new Date()
+        }
+      ]);
+    }
+  } catch (error) {
     setGroupChat((prevGroupChat) => [
       ...prevGroupChat, 
       {
         id : uuidv4(),
         sender: 'ai',
-        message: yourChat,
+        message: "AI nya Sudah Terkena Limit,Mohon Maaf! :).",
         createdDate: new Date()
       }
     ]);
+  }
+};
 
-}
+// const submitYourChat = async () => {
+//   if (yourChat === '') return;  
+//   setGroupChat((prevGroupChat) => [
+//     ...prevGroupChat, 
+//     {
+//       id : uuidv4(),
+//       sender: 'user',
+//       message: yourChat,
+//       createdDate: new Date(),
+//       reply : replyChat ? replyChat : undefined
+//     }
+//   ]);
+//   setYourChat("");
+//   setReplayChat(null)
+//     await new Promise(resolve => setTimeout(resolve, 1000));
+//     setGroupChat((prevGroupChat) => [
+//       ...prevGroupChat, 
+//       {
+//         id : uuidv4(),
+//         sender: 'ai',
+//         message: yourChat,
+//         createdDate: new Date()
+//       }
+//     ]);
+
+// }
 const getTodoButtonClassNames = () => {
   if (openChatModal) {
     return 'translate-x-[-150%]';
