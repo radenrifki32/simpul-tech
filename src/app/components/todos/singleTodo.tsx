@@ -1,9 +1,10 @@
 import * as React from "react";
 import { formatDateTime, getDaysLeft } from "@/utils/date";
-import { Todo } from "@/utils/types";
+import { FavoriteTodo, Todo } from "@/utils/types";
 import Image from "next/image";
 import Clock from "@/icons/Clock";
 import PencilIcon from "@/icons/pencil";
+import { favoriteTodo } from "@/utils/dummy";
 
 interface SingleTodoProps {
   todo: Todo;
@@ -13,6 +14,7 @@ interface SingleTodoProps {
   ) => void;
   handleEditTodoList: (id: number, value: string) => void;
   handleDeleteTodoList: (id: number) => void;
+  handleAddFavorite: (favorite: FavoriteTodo, id : number) => void;
 }
 
 export default function SingleTodo({
@@ -20,17 +22,18 @@ export default function SingleTodo({
   handleChange,
   handleEditTodoList,
   handleDeleteTodoList,
+  handleAddFavorite
 }: SingleTodoProps) {
   const [changeToInput, setChangeToInput] = React.useState<boolean>(false);
-  const [value, setValue] = React.useState<string>(todo.title);
+  const [value, setValue] = React.useState<string>(todo.description || "");
   const [showDeleteModal, setShowDeleteModal] = React.useState<boolean>(false);
-  const [expandedTodoId, setExpandedTodoId] = React.useState<number | null>(
-    null
-  );
-
+  const [expandedTodoId, setExpandedTodoId] = React.useState<number | null>(null);
+  const [openFavorite, setOpenFavorite] = React.useState<boolean>(false);
   const handleShowTodo = (id: number) => {
+    setOpenFavorite(false)
     setExpandedTodoId(expandedTodoId === id ? null : id);
   };
+
 
   const handleEdit = () => {
     setChangeToInput(!changeToInput);
@@ -39,7 +42,9 @@ export default function SingleTodo({
   const openModalDelete = () => {
     setShowDeleteModal(!showDeleteModal);
   };
+
   const { days, status } = getDaysLeft(todo.createdDate ? new Date(todo.createdDate) : new Date());
+
 
   return (
     <>
@@ -130,12 +135,12 @@ export default function SingleTodo({
         </div>
 
         <div
-          className={`overflow-hidden transition-max-height duration-500 ease-in-out ${
-            expandedTodoId === todo.id ? "max-h-screen" : "max-h-0"
-          }`}
+        className={` w-full transition-max-height duration-500 ease-in-out relative ${
+          expandedTodoId === todo.id ? "max-h-screen" : "max-h-0"
+        } ${openFavorite ? 'overflow-visible' : 'overflow-hidden'}`}
         >
           <div className="flex items-center gap-6 mx-vertical mt-4">
-            <Clock/>
+            <Clock />
             <div className="relative flex items-center w-2/5">
               <input
                 value={todo.createdDate ? new Date(todo.createdDate).toISOString().split("T")[0] : ""}
@@ -145,26 +150,55 @@ export default function SingleTodo({
             </div>
           </div>
           <div className="flex items-start gap-6 mx-vertical mt-4 w-full">
-            <PencilIcon handleClick={()=> handleEdit()}/>
-            <div className="w-full">
+            <PencilIcon handleClick={() => handleEdit()} />
+            <div className="w-full me-vertical">
               {changeToInput ? (
-                <input
-                  type="text"
+                <textarea
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
-                  onBlur={() => handleEditTodoList(todo.id || 0, value)}
-                  className="border-[1px] border-primary-gray px-2 py-2 rounded-md font-lato text-small text-primary-black"
-                  size={value.length > 0 ? value.length : 1}
+                  onBlur={() => handleEditTodoList(todo.id || 0, value || '')}
+                  className="border-[1px] border-primary-gray px-2 py-2 rounded-md font-lato text-small text-primary-black w-full"
                 />
               ) : (
-                <p className="font-lato text-small text-primary-black">
+                <p
+                  className="font-lato text-small text-primary-black"
+                >
                   {todo.description}
                 </p>
               )}
             </div>
           </div>
+          <div className="flex items-center gap-6 mx-vertical mt-4 w-full bg-[#F9F9F9] py-2 px-2 rounded-sm overflow-x-scroll">
+  <Image src="/icons/favorite.svg" width={20} height={20} alt="favorite" onClick={()=> setOpenFavorite(!openFavorite)} />
+  <div className="w-full me-vertical">
+    <div className="flex items-center gap-2">
+      {todo.favorite && todo.favorite.map((favorite, index) => (
+        <div key={index} className={`bg-${favorite.color} px-2 py-2 mx-2 rounded-md`}>
+          <p className="font-lato font-bold text-small text-center text-primary-black whitespace-nowrap">
+            {favorite.title}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+{openFavorite && (
+        <div className="absolute -bottom-[] left-5 z-20 w-1/2 bg-white shadow-md rounded-md border-[1px] border-primary-black px-4 py-4">
+          <div className="flex flex-col items-center gap-3">
+          {favoriteTodo.map((favorite, index) => (
+        <div key={index} className={`bg-${favorite.color} px-2 py-2 mx-2 rounded-md w-full cursor-pointer`} onClick={()=>handleAddFavorite(favorite,todo.id ?? 0)}>
+          <p className="font-lato font-bold text-small text-primary-black whitespace-nowrap">
+            {favorite.title}
+          </p>
+        </div>
+      ))}
+          </div>
+        </div>  
+      )
+      }
         </div>
       </div>
+
       <hr className="w-full border-t border-primary-black" />
     </>
   );

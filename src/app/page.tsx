@@ -5,7 +5,7 @@ import ButtonRound from "./components/button/ButtonRounded";
 import Modal from "./components/modals/chatModal";
 import Chat from "./components/chat/chat";
 import { ChatServiceImpl } from "@/service/chats";
-import { Chats, Message, Todo } from "@/utils/types";
+import { Chats, Message, Reply, Todo } from "@/utils/types";
 import MessageIcon from "@/icons/messaging";
 import { ChatUser } from "./components/chat/ChatUser";
 import { v4 as uuidv4 } from 'uuid';
@@ -30,6 +30,8 @@ export default function Home() {
   const [detailChat,setDetailChat] = React.useState<Chats | null>(null)
   const [yourChat,setYourChat] = React.useState<string>('')
   const [dataTodo,setDataTodo] = React.useState<Todo[]>([])
+  const [replyChat,setReplayChat] = React.useState<Reply | null >(null)
+
 
 
   const handleClickOpenChatAndTodo = () => {
@@ -74,7 +76,7 @@ export default function Home() {
     
     try {
       if (isLoading) {
-        await delay(3000); 
+        await delay(1000); 
       }
       await fetchAndSetChats(); 
     } catch (error) {
@@ -111,7 +113,7 @@ const getDataTodo = async () => {
   setLoadingTodo(true);
   
   try {
-    await delay(2000); 
+    await delay(1000); 
     await fetchAndSetTodo(); 
   } catch (error) {
     setError("Unexpected error occurred");
@@ -125,6 +127,7 @@ const getDataTodo = async () => {
 
 const getDataChatById = async (id: number) => {
   setNextStepChat(true);
+  setDetailChat(null)
   try {
     const response = await chatService.getDataChatById(id);
     if (response && !(response instanceof Error)) {
@@ -215,11 +218,13 @@ const submitYourChat = async () => {
       id : uuidv4(),
       sender: 'user',
       message: yourChat,
-      createdDate: new Date()
+      createdDate: new Date(),
+      reply : replyChat ? replyChat : undefined
     }
   ]);
   setYourChat("");
-    await new Promise(resolve => setTimeout(resolve, 2000));
+  setReplayChat(null)
+    await new Promise(resolve => setTimeout(resolve, 1000));
     setGroupChat((prevGroupChat) => [
       ...prevGroupChat, 
       {
@@ -285,7 +290,7 @@ const getTodoButtonClassNames = () => {
             {nextStepChat === true 
             ?
             <div className="w-full h-full py-vertical">
-            <ChatUser conversation={groupChat} detailChat={detailChat} handleClick={submitYourChat} onChange={(e)=> setYourChat(e.target.value)} value={yourChat} setYourChat={setYourChat} setConversation={setGroupChat} back={setNextStepChat} close={handleClickCloseChat} />
+            <ChatUser conversation={groupChat} detailChat={detailChat} handleClick={submitYourChat} onChange={(e)=> setYourChat(e.target.value)} value={yourChat} setYourChat={setYourChat} setConversation={setGroupChat} back={setNextStepChat} close={handleClickCloseChat} replyChat={replyChat} setReplyChat={setReplayChat} />
             </div>
 
             : 

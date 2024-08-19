@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Chats, Message } from '@/utils/types';
+import { Chats, Message, Reply } from '@/utils/types';
 import Image from 'next/image';
 import { MessageBubble } from './messageBuble';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,6 +8,8 @@ import Button from '../button/Button';
 interface ChatUserProps {
     conversation: Message[];
     detailChat: Chats | null;
+    replyChat: Reply | null;
+    setReplyChat : React.Dispatch<React.SetStateAction<Reply | null>>
     value: string;
     handleClick: () => void;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -17,12 +19,13 @@ interface ChatUserProps {
     close : ()=> void
 }
 
-export function ChatUser({ conversation, detailChat, handleClick, value, onChange, setYourChat,setConversation,back,close }: ChatUserProps) {
+export function ChatUser({ conversation, detailChat, handleClick, value, onChange, setYourChat,setConversation,back,close,replyChat,setReplyChat}: ChatUserProps) {
     const [publicMessages, setPublicMessages] = React.useState<Message[]>([]);
     const [lastMessageDate, setLastMessageDate] = React.useState<Date | null>(null);
     const [showNewMessage, setShowNewMessage] = React.useState(false);
     const [editingId, setEditingId] = React.useState<string | null>(null);
     const [activeMenuId, setActiveMenuId] = React.useState<string | null>(null);
+
 
 
     const allMessages = [...conversation, ...publicMessages].sort((a, b) => a.createdDate.getTime() - b.createdDate.getTime());
@@ -41,6 +44,18 @@ export function ChatUser({ conversation, detailChat, handleClick, value, onChang
     const handleMenuToggle = (id: string) => {
         setActiveMenuId(prevId => (prevId === id ? null : id));
     };
+    const handleReply = (id: string) => {
+        const message = allMessages.find((message)=> message.id === id)
+        if(message) {
+            const reply: Reply = {
+                id: message.id, 
+                body: message.message,
+                sender: message.sender
+            };
+            setReplyChat(reply)
+            setActiveMenuId(null)
+        }
+    }
     const getDateSeparator = (index: number) => {
         return index === 3;
     };
@@ -136,28 +151,44 @@ export function ChatUser({ conversation, detailChat, handleClick, value, onChang
                         sender={msg.sender}
                         createdDate={msg.createdDate}
                         message={msg.message}
+                        allMessage= {msg}
                         username={detailChat?.email.split('@')[0] ?? null}
                         showDate={getDateSeparator(index)}
                         index={msg.id}
                         showMenu={activeMenuId === msg.id}
                         onMenuToggle={() => handleMenuToggle(msg.id)}
+                        handleReply={()=> handleReply(msg.id)}
                     />
                 ))}
             </div>
 
-            <div className="sticky bottom-0 w-full bg-white px-vertical py-2 flex items-center gap-2">
-                <input
-                    onChange={onChange}
-                    value={value}
-                    type="text"
-                    placeholder="Type a message"
-                    className="flex-grow p-2 border border-primary-black rounded-md placeholder:text-primary-black"
-                />
-                {/* <button className="px-4 py-2 bg-primary-blue text-white rounded-lg font-lato" onClick={submitMessage}>
-                    Send
-                </button> */}
-                <Button handleClick={()=>submitMessage()} size='md' color='primary-blue'>Send</Button>
-            </div>
+            <div className="sticky bottom-0 w-full bg-white px-vertical py-2">
+    {replyChat && (
+        <div className="w-[87%] bg-primary-white py-2 px-2 rounded-t-md">
+            <p className="font-lato font-bold text-name text-primary-black">
+                Replying To {replyChat?.sender === 'ai' ? detailChat?.email.split('@')[0] ?? null : 'Hansohe'}
+            </p>
+            <p className="font-lato font-light text-small text-primary-black mt-1">
+                {replyChat?.body}
+            </p>
+        </div>
+    )}
+    <div className="w-full flex items-center gap-2">
+        <input
+            onChange={onChange}
+            value={value}
+            type="text"
+            placeholder="Type a message"
+            className="flex-grow p-2 border border-primary-black rounded-md placeholder:text-primary-black"
+        />
+        <Button handleClick={() => submitMessage()} size='md' color='primary-blue'>
+            Send
+        </Button>
+    </div>
+</div>
+
+
+
         </div>
     );
 }

@@ -1,4 +1,5 @@
 import { fomatDateHours } from '@/utils/date';
+import { Message, Reply } from '@/utils/types';
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
@@ -14,10 +15,12 @@ interface MessageBubbleProps {
     index : string
     showMenu: boolean; 
     onMenuToggle: () => void; 
+    handleReply: (id: string) => void; 
+    allMessage : Message
 }
 
 export function MessageBubble({
-    sender, message, username, createdDate, isNewMessage, showDate,index,showMenu,onMenuToggle,onEdit,onDelete
+    allMessage,sender, message, username, createdDate, isNewMessage, showDate,index,showMenu,onMenuToggle,onEdit,onDelete,handleReply
 }: MessageBubbleProps) {
     let bubbleClass = '';
     let textColorClass = '';
@@ -65,28 +68,47 @@ export function MessageBubble({
             )}
             {isNewMessage && (
                 <div className="flex items-center justify-center my-4">
-                    <p className="px-4 font-lato font-medium text-primary-blue bg-[#E9F3FF] py-2 rounded-md">New Message</p>
+                    <p className="px-4 font-lato font-medium text-primary-blue bg-[#E9F3FF] py-2 rounded-md">New Message </p>
                 </div>
             )}
-            <p className={`font-lato font-bold text-name ${sender === 'user' ? 'text-chats-purple-primary' : sender === 'ai' ? 'text-chats-orange-primary' : 'text-chats-green-primary'} mb-1`}>
+             <p className={`font-lato font-bold text-name ${sender === 'user' ? 'text-chats-purple-primary' : sender === 'ai' ? 'text-chats-orange-primary' : 'text-chats-green-primary'} mb-1`}>
                 {displayUsername}
             </p>
+            <div className={`flex justify-end  ${sender === 'user' ? 'my-2' : ''}`}>
+            {
+                allMessage.reply &&
+                  <div className={`p-2 max-w-md rounded-lg bg-primary-white text-primary-black break-words overflow-hidden whitespace-normal relative`}>
+                  <ReactMarkdown className='font-lato font-light text-small text-left'>{allMessage.reply.body}</ReactMarkdown>
+              </div>  
+                }
+            </div>
+            
             <div className={`flex ${sender === 'user' ? 'justify-end' : 'justify-start'} items-start relative`}>
+                 {sender === 'user' && showMenu && (
+                    <div className="mt-2 bg-white border border-gray-300 shadow-md rounded-md w-1/6">
+                        <button onClick={()=> onEdit(index)} className=" font-lato text-name block px-4 py-2 text-primary-blue hover:bg-gray-100 w-full text-left">Edit</button>
+                        <hr className='w-full'/>
+                        <button onClick={()=> onDelete(index)} className="block px-4 font-lato text-name py-2 text-indicators-red hover:bg-gray-100 w-full text-left">Delete</button>
+                    </div>
+                )}
                 {sender === 'user' && (
                     <div onClick={onMenuToggle} className="mr-4 cursor-pointer">
                         <span className="material-icons">...</span>
                     </div>
                 )}
-                <div className={`p-2 max-w-md rounded-lg ${backgroundColorClass} ${textColorClass}`}>
-                    <ReactMarkdown className='font-lato font-light text-small text-left'>{message}</ReactMarkdown>
-                    <p className='font-lato font-light text-small pt-1 text-left'>{fomatDateHours(createdDate)}</p>
-                </div>
-                {sender !== 'user' && <div className="ml-4">...</div>}
-                {sender === 'user' && showMenu && (
-                    <div className="absolute right-20 mt-2 bg-white border border-gray-300 shadow-md rounded-md w-1/6">
-                        <button onClick={()=> onEdit(index)} className=" font-lato text-name block px-4 py-2 text-primary-blue hover:bg-gray-100 w-full text-left">Edit</button>
+               
+                            
+     <div className={`p-2 max-w-md rounded-lg ${backgroundColorClass} ${textColorClass} break-words overflow-hidden whitespace-normal relative`}>
+    <ReactMarkdown className='font-lato font-light text-small text-left'>{message}</ReactMarkdown>
+    <p className='font-lato font-light text-small pt-1 text-left'>{fomatDateHours(createdDate)}</p>
+</div>
+                {sender !== 'user' && <div onClick={onMenuToggle} className="ml-4 cursor-pointer">...</div>}
+                
+                {sender !== 'user' && showMenu && (
+                    <div className="mt-2 bg-white border border-gray-300 shadow-md rounded-md w-1/6">
+                        <button  className=" font-lato text-name block px-4 py-2 text-primary-blue hover:bg-gray-100 w-full text-left">Share</button>
                         <hr className='w-full'/>
-                        <button onClick={()=> onDelete(index)} className="block px-4 font-lato text-name py-2 text-indicators-red hover:bg-gray-100 w-full text-left">Delete</button>
+                        <button onClick={()=> handleReply(index)} className="block px-4 font-lato text-name py-2 text-primary-blue hover:bg-gray-100 w-full text-left">Reply</button>
                     </div>
                 )}
             </div>

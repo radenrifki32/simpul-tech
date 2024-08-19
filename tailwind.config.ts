@@ -65,6 +65,10 @@ const config: Config = {
             primary: "#CFCEF9",
             light: "#F9E0FD",
           },
+          blue : {
+            primary : '#9DD0ED',
+            light :  "#E5F1FF"
+          }
         },
       },
       backgroundImage: {

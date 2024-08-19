@@ -2,7 +2,7 @@ import * as React from "react";
 import Image from "next/image";
 import Button from "../button/Button";
 import SingleTodo from "./singleTodo";
-import { Todo } from "@/utils/types";
+import { FavoriteTodo, Todo } from "@/utils/types";
 import AddTodo from "./AddTodo";
 import Loading from "../Loading/loading";
 
@@ -57,18 +57,25 @@ export default function Todos({ todo, setTodo, loading }: TodosProps) {
   const handleClick = () => {
     setShowDropDown(!showDropDown);
   };
-  const handleChangeFormTodo = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    let convertedValue: any = value;
-    if (name === "createdDate") {
+  const handleChangeFormTodo = (
+    event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const target = event.target as HTMLInputElement | HTMLTextAreaElement;
+
+    const { name, type, value } = target;
+    let convertedValue: any;
+
+    if (type === "checkbox") {
+      convertedValue = (target as HTMLInputElement).checked;
+    } else if (name === "createdDate") {
       convertedValue = new Date(value);
+    } else {
+      convertedValue = value;
     }
-    if (name === "completed") {
-      convertedValue = event.target.checked;
-    }
+
     setFormTodo({
       ...formTodo,
-      [name]: value,
+      [name]: convertedValue,
     });
   };
   const handleClickUrgentTodo = () => {
@@ -94,22 +101,40 @@ export default function Todos({ todo, setTodo, loading }: TodosProps) {
   const showAllAgain = () => {
     setFilteredTodo(todoCopied);
   };
+  const handleAddFavorite = (favorite : FavoriteTodo,id : number) => {
+    const updatedTodos = filteredTodo.map((item) => {
+      if (item.id === id) {
+        const isAlreadyFavorite = item.favorite && item.favorite.some(
+          (fav) => fav.id === favorite.id
+        );
+    
+        if (!isAlreadyFavorite) {
+          item.favorite = item.favorite ? [...item.favorite, favorite] : [favorite];
+        }
+      }
+      return item;
+    });
+    setTodo(updatedTodos);
+  };
+  
 
   const handleNotCompleted = () => {
     const notCompleted = todo.filter((item) => !item.completed);
     setFilteredTodo(notCompleted);
   };
   const handleEditTodoList = (id: number, value: string) => {
-    const editTodo = todo.filter((item) => {
+    console.log('ok')
+    const editTodo = filteredTodo.filter((item) => {
       if (item.id === id) {
-        item.title = value;
+        console.log(item.description)
+        item.description = value;
       }
       return item;
     });
     setTodo(editTodo);
   };
   const handleDeleteTodoList = (id: number) => {
-    const deleteTodo = todo.filter((item) => {
+    const deleteTodo = filteredTodo.filter((item) => {
       if (item.id !== id) {
         return item;
       }
@@ -127,6 +152,7 @@ export default function Todos({ todo, setTodo, loading }: TodosProps) {
   }, [addTodo]);
 
   const newTask = () => {
+    console.log(formTodo)
     const newTask = [...todo];
     newTask.push({
       id: todo.length + 2,
@@ -153,7 +179,7 @@ export default function Todos({ todo, setTodo, loading }: TodosProps) {
           className="flex gap-2 items-center border-primary-gray border-[1px] px-4 py-2 rounded-md ms-12 cursor-pointer relative"
           onClick={handleClick}
         >
-          <p className="font-lato text-name text-primary-black">My Task {loading ? "loading" : "Ga"}</p>
+          <p className="font-lato text-name text-primary-black">My Task</p>
           <Image src="/icons/arrow.svg" alt="arrow" width={20} height={20} />
           {showDropDown && (
             <div className="absolute top-12 w-[280px] -left-[70px] z-10 bg-white border-[1px] border-primary-gray rounded-md">
@@ -206,6 +232,7 @@ export default function Todos({ todo, setTodo, loading }: TodosProps) {
               handleChange={handleChange}
               handleEditTodoList={handleEditTodoList}
               handleDeleteTodoList={handleDeleteTodoList}
+              handleAddFavorite={handleAddFavorite}
             />
           ))
         )}
