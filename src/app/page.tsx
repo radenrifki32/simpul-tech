@@ -162,11 +162,15 @@ const submitYourChat = async () => {
       id : uuidv4(),
       sender: 'user',
       message: yourChat,
-      createdDate: new Date()
+      createdDate: new Date(),
+      reply : replyChat ? replyChat : undefined
+
     }
   ]);
-  setYourChat("");
-  await new Promise(resolve => setTimeout(resolve, 3000));
+    setYourChat("");
+    setReplayChat(null)
+
+  await new Promise(resolve => setTimeout(resolve, 1000));
   try {
     const response = await groq.chat.completions.create({
       messages: [{

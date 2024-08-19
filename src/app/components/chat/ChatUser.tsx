@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { MessageBubble } from './messageBuble';
 import { v4 as uuidv4 } from 'uuid';
 import Button from '../button/Button';
+import Markdown from 'react-markdown';
 
 interface ChatUserProps {
     conversation: Message[];
@@ -37,6 +38,12 @@ export function ChatUser({ conversation, detailChat, handleClick, value, onChang
             setEditingId(id)
         }
     };
+    const truncateText = (text: string, maxLength: number = 100): string =>  {
+        if (text.length > maxLength) {
+            return text.substring(0, maxLength) + '...';
+        }
+        return text;
+    }
     const handleDelete = (id: string) => {
         const removeChatUser =  conversation.filter((message)=> message.id !== id)
         setConversation(removeChatUser)
@@ -98,7 +105,7 @@ export function ChatUser({ conversation, detailChat, handleClick, value, onChang
                 ]);
             }
         };
-        const intervalId = setInterval(addPublicMessage, 10000);
+        const intervalId = setInterval(addPublicMessage, 10000000000);
         return () => clearInterval(intervalId);
     }, [publicMessages]);
 
@@ -168,9 +175,9 @@ export function ChatUser({ conversation, detailChat, handleClick, value, onChang
             <p className="font-lato font-bold text-name text-primary-black">
                 Replying To {replyChat?.sender === 'ai' ? detailChat?.email.split('@')[0] ?? null : 'Hansohe'}
             </p>
-            <p className="font-lato font-light text-small text-primary-black mt-1">
-                {replyChat?.body}
-            </p>
+            <Markdown className="font-lato font-light text-small text-primary-black mt-1">
+                {truncateText(replyChat?.body)}
+            </Markdown>
         </div>
     )}
     <div className="w-full flex items-center gap-2">
