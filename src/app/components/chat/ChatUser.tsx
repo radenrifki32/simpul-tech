@@ -105,7 +105,7 @@ export function ChatUser({ conversation, detailChat, handleClick, value, onChang
                 ]);
             }
         };
-        const intervalId = setInterval(addPublicMessage, 10000000000);
+        const intervalId = setInterval(addPublicMessage, 6000);
         return () => clearInterval(intervalId);
     }, [publicMessages]);
 
